@@ -1,0 +1,37 @@
+name: Cx 2ms Secret Scan (with SARIF upload)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  scan:
+    name: Run Secret Scan and Upload to Security Tab
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Cx 2ms scan and output SARIF
+        run: |
+          docker run --rm -u $(id -u):$(id -g) \
+            -v ${{ github.workspace }}:/repo \
+            checkmarx/2ms:3.21.0 git /repo \
+            --stdout-format sarif \
+            --report-path /repo/cx-output.sarif \
+            --validate
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: cx-output.sarif
+
+      - name: Upload scan reports as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan-reports
+          path: |
+            cx-output.sarif
