@@ -2,9 +2,9 @@ name: Cx 2ms Secret Scan (with SARIF upload)
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   scan:
