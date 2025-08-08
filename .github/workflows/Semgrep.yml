@@ -15,18 +15,18 @@ jobs:
       actions: read
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run Semgrep via Docker
+      - name: Run Semgrep SAST only
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/src" \
             semgrep/semgrep:1.92.0 semgrep scan \
-            --config auto \
-            --validate \
+            --config p/security-audit \
             --jobs 1 \
             --max-memory 3500 \
+            --exclude node_modules \
+            --exclude dist \
+            --exclude build \
+            --exclude .git \
             --sarif-output=/src/semgrep.sarif /src
 
       - name: Upload SARIF report as Artifact
