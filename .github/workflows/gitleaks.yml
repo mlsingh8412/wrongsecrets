@@ -7,13 +7,26 @@ on:
     branches: [master]
 
 jobs:
-  scan:
-    name: gitleaks
+  gitleaks:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read       
+      security-events: write  
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks via Docker
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/path \
+            - w /path \
+            zricethezav/gitleaks:latest git \
+            --report-format=sarif \
+            --report-path="/path/gitleaks.sarif"
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sarif_file: gitleaks.sarif
