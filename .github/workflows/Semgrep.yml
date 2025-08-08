@@ -1,0 +1,38 @@
+name: Semgrep Scan
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read       
+      security-events: write  
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep via Docker
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/src \
+            semgrep/semgrep semgrep scan \
+            --sarif-output=semgrep.sarif \
+            --validate /src
+      
+      - name: Upload SARIF report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif-report
+          path: semgrep.sarif
+          retention-days: 7
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
