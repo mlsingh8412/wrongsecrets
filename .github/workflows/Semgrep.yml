@@ -23,7 +23,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}:/src" \
             semgrep/semgrep:1.92.0 semgrep scan \
-            --config=auto \
+            --config auto \
             --validate \
             --sarif-output=/src/semgrep.sarif /src
 
