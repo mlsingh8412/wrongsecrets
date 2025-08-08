@@ -7,11 +7,12 @@ on:
     branches: [master]
 
 jobs:
-  gitleaks:
+  semgrep:
     runs-on: ubuntu-latest
     permissions:
-      contents: read       
-      security-events: write  
+      contents: read
+      security-events: write
+      actions: read
 
     steps:
       - name: Checkout repository
@@ -20,11 +21,12 @@ jobs:
       - name: Run Semgrep via Docker
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/src \
-            semgrep/semgrep semgrep scan \
-            --sarif-output=semgrep.sarif \
-            --validate --config=auto /src
-      
+            -v "${{ github.workspace }}:/src" \
+            semgrep/semgrep:1.92.0 semgrep scan \
+            --config=auto \
+            --validate \
+            --sarif-output=/src/semgrep.sarif /src
+
       - name: Upload SARIF report as Artifact
         uses: actions/upload-artifact@v4
         with:
