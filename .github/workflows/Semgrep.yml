@@ -25,6 +25,8 @@ jobs:
             semgrep/semgrep:1.92.0 semgrep scan \
             --config auto \
             --validate \
+            --jobs 1 \
+            --max-memory 3500 \
             --sarif-output=/src/semgrep.sarif /src
 
       - name: Upload SARIF report as Artifact
