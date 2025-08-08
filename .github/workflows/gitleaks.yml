@@ -7,22 +7,13 @@ on:
     branches: [master]
 
 jobs:
-  gitleaks:
+  scan:
+    name: gitleaks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Gitleaks
-        run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
-          chmod +x gitleaks
-          ./gitleaks detect --source . \
-            --report-format sarif \
-            --report-path gitleaks-output.sarif || true
-        continue-on-error: true
-
-      - name: Upload SARIF to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+      - uses: actions/checkout@v4
         with:
-          sarif_file: gitleaks-output.sarif
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
