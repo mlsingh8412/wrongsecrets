@@ -1,2 +1,2 @@
-# Exclude test folders
-**/src/test/**
+# Ignore anything inside src/test/
+path:.*src/test/.*
