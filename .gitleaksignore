@@ -1,2 +1,1 @@
-# Ignore anything inside src/test/
-path:.*src/test/.*
+path:src/test/
